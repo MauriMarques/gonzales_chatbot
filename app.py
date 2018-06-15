@@ -1,6 +1,8 @@
 import random
 from flask import Flask, request
 from pymessenger.bot import Bot
+from googletrans import Translator
+
 
 app = Flask(__name__)
 
@@ -24,7 +26,7 @@ def receive_message():
                 if message.get("message"):
                     recipient_id = message["sender"]["id"]
                     if message["message"].get("text"):
-                        response_sent_text = get_message()
+                        response_sent_text = get_translated_message(message["message"].get("text"))
                         send_message(recipient_id, response_sent_text)
 
                     if message["message"].get("attachments"):
@@ -38,6 +40,12 @@ def verify_fb_token(token_sent):
     if token_sent == VERIFY_TOKEN:
         return request.args.get("hub.challenge")
     return "Invalid verification token"
+
+
+def get_translated_message(message_to_translate):
+    translator = Translator()
+    translation = translator.translate(message_to_translate, src="pt", dest="en")
+    return translation.text
 
 
 def get_message():
