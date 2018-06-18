@@ -31,7 +31,7 @@ def receive_message():
                     recipient_id = message["sender"]["id"]
                     if message["message"].get("text"):
                         response_sent_text = get_translated_message(message["message"].get("text"))
-                        send_message(recipient_id, response_sent_text, audio_path)
+                        send_message(recipient_id, response_sent_text)
 
                     if message["message"].get("attachments"):
                         response_sent_nontext = get_message()
@@ -63,7 +63,7 @@ def get_message():
 
 def send_message(recipient_id, response):
     bot.send_text_message(recipient_id, response)
-    send_audio(recipient_id, audio=audio_path)
+    send_audio(recipient_id)
     return "success"
 
 
