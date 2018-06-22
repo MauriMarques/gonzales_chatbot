@@ -1,11 +1,15 @@
 import random
 import os
 import requests
+import numpy as np
+import urllib.request
+import image_classifier
 from requests_toolbelt import MultipartEncoder
 from flask import Flask, request
 from pymessenger.bot import Bot
 from googletrans import Translator
 from gtts import gTTS
+from PIL import Image
 
 
 app = Flask(__name__)
@@ -31,11 +35,17 @@ def receive_message():
                     recipient_id = message["sender"]["id"]
                     if message["message"].get("text"):
                         response_sent_text = get_translated_message(message["message"].get("text"))
+                        generate_audio(response_sent_text)
                         send_message(recipient_id, response_sent_text)
 
                     if message["message"].get("attachments"):
-                        response_sent_nontext = get_message()
-                        send_message(recipient_id, response_sent_nontext)
+                        attachments = message["message"].get("attachments")
+                        attachment_url = attachments[0]["payload"]["url"]
+                        image = download_image_attachment(attachment_url)
+                        label = image_classifier.predict(image)
+                        generate_audio(label)
+                        send_message(recipient_id, label)
+
 
     return "Message Processed"
 
@@ -49,11 +59,12 @@ def verify_fb_token(token_sent):
 def get_translated_message(message_to_translate):
     translator = Translator()
     translation = translator.translate(message_to_translate, src="pt", dest="en")
-
-    tts = gTTS(translation.text)
-    tts.save(audio_path)
-
     return translation.text
+
+
+def generate_audio(text):
+    tts = gTTS(text)
+    tts.save(audio_path)
 
 
 def get_message():
@@ -87,6 +98,10 @@ def send_audio(recipient_id):
     }
     return requests.post('{0}/me/messages'.format(bot.graph_url), data=multipart_data,
                          params=bot.auth_args, headers=multipart_header).json()
+
+
+def download_image_attachment(url):
+    return Image.open(requests.get(url, stream=True).raw)
 
 
 if __name__ == "__main__":
