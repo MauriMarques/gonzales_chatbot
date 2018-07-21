@@ -10,7 +10,7 @@ from gtts import gTTS
 from PIL import Image
 import speech_recognition as sr
 from pydub import AudioSegment
-
+import telepot
 
 app = Flask(__name__)
 
@@ -22,9 +22,37 @@ received_audio_path = "received_audio.aac"
 received_audio_wav_path = "received_audio.wav"
 speech_recog = sr.Recognizer()
 
-@app.route('/', methods=['GET', 'POST'])
+TOKEN = '635208413:AAEAXqp22Td5D74fvgFRzrwtN5r0FciZjzM'
+TelegramBot = telepot.Bot(TOKEN)
+
+@app.route('/' + TOKEN, methods=['POST'])
+def receive_tel_message():
+    try:
+        message = request.get_json()
+    except ValueError:
+        return "Error"
+    else:
+        print(message)
+        chat_id = message['message']['chat']['id']
+        if message["message"].get("text"):
+            response_sent_text = get_translated_message(message["message"].get("text"))
+            generate_audio(response_sent_text)
+            send_message(chat_id, response_sent_text)
+        elif message["message"].get("photo"):
+            photo_id = message["message"].get("photo")
+            TelegramBot.download_file(photo_id, "./photo.jpg")
+            image = Image.open("photo.jpg")
+            label = image_classifier.predict(image)
+            translated_message = get_translated_message(label, src="en")
+            generate_audio(translated_message)
+            TelegramBot.sendMessage(chat_id, translated_message)
+            audio = open(audio_path, 'rb')
+            TelegramBot.sendAudio(chat_id, audio)
+
+    return "Sucesso"
 
 
+@app.route('/face', methods=['GET', 'POST'])
 def receive_message():
     if request.method == 'GET':
         token_sent = request.args.get("hub.verify_token")
