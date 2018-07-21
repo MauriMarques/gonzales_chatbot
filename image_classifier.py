@@ -1,10 +1,10 @@
 from PIL import Image
 from keras.preprocessing.image import img_to_array
-from keras.applications.vgg16 import preprocess_input
-from keras.applications.vgg16 import decode_predictions
-from keras.applications.vgg16 import VGG16
+from keras.applications.mobilenet import preprocess_input
+from keras.applications.mobilenet import decode_predictions
+from keras.applications.mobilenet import MobileNet
 
-model = VGG16()
+model = MobileNet()
 
 
 def predict(image):
