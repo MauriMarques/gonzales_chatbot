@@ -19,6 +19,7 @@ googletrans==2.3.0
 grpcio==1.12.1
 gTTS==2.0.0
 gTTS-token==1.1.1
+gunicorn==19.9.0
 h5py==2.8.0
 html5lib==0.9999999
 idna==2.7
