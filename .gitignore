@@ -27,6 +27,8 @@ var/
 .idea
 .idea/workspace.xml
 *.mp3
+*.aac
+*.wav
 
 # Installer logs
 pip-log.txt
