@@ -3,7 +3,7 @@ import os
 import requests
 import image_classifier
 from requests_toolbelt import MultipartEncoder
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 from pymessenger.bot import Bot
 from googletrans import Translator
 from gtts import gTTS
@@ -12,18 +12,26 @@ import speech_recognition as sr
 from pydub import AudioSegment
 import telepot
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="audio")
 
 ACCESS_TOKEN = "EAAIj1rbKwNABALab50gBoXT2eMd1MYhFP0jw6MAG4eLVGwTKYufUxkZAAzllNGxo1Gu59xwloY8IEdJGvoaUOOXEkuJcLUbx4irhbZCvbyxEqss7m3vA5XkwhlxH8ZBQdvayq3IBw5vANx9mE6ec82BZBHHzH3z4qTaFJWQ75Yf0Lb9LX3sM"
 VERIFY_TOKEN = "TOKENDOCHATBOT"
 bot = Bot(ACCESS_TOKEN)
-audio_path = "audio.mp3"
-received_audio_path = "received_audio.aac"
-received_audio_wav_path = "received_audio.wav"
+audio_path = "/audio/audio.mp3"
+received_audio_path = "/audio/received_audio.aac"
+received_audio_wav_path = "/audio/received_audio.wav"
 speech_recog = sr.Recognizer()
+
+domain = "https://www.botgonzales.tk"
 
 TOKEN = '635208413:AAEAXqp22Td5D74fvgFRzrwtN5r0FciZjzM'
 TelegramBot = telepot.Bot(TOKEN)
+
+
+@app.route('/audio/<path:filename>', methods=['GET', 'POST'])
+def download(filename):
+    return send_from_directory('audio', filename)
+
 
 @app.route('/' + TOKEN, methods=['POST'])
 def receive_tel_message():
@@ -37,7 +45,8 @@ def receive_tel_message():
         if message["message"].get("text"):
             response_sent_text = get_translated_message(message["message"].get("text"))
             generate_audio(response_sent_text)
-            send_message(chat_id, response_sent_text)
+            TelegramBot.sendMessage(chat_id, response_sent_text)
+            TelegramBot.sendAudio(chat_id, domain + audio_path)
         elif message["message"].get("photo"):
             photo_id = message["message"].get("photo")
             TelegramBot.download_file(photo_id, "./photo.jpg")
@@ -46,8 +55,7 @@ def receive_tel_message():
             translated_message = get_translated_message(label, src="en")
             generate_audio(translated_message)
             TelegramBot.sendMessage(chat_id, translated_message)
-            audio = open(audio_path, 'rb')
-            TelegramBot.sendAudio(chat_id, audio)
+            TelegramBot.sendAudio(chat_id, domain + audio_path)
 
     return "Sucesso"
 
