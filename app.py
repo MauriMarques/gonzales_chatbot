@@ -1,5 +1,6 @@
 import random
 import os
+import uuid
 import requests
 import image_classifier
 from requests_toolbelt import MultipartEncoder
@@ -22,7 +23,7 @@ received_audio_path = "audio/received_audio.aac"
 received_audio_wav_path = "audio/received_audio.wav"
 speech_recog = sr.Recognizer()
 
-domain = "https://www.botgonzales.tk"
+domain = "https://www.botgonzales.tk/"
 
 TOKEN = '635208413:AAEAXqp22Td5D74fvgFRzrwtN5r0FciZjzM'
 TelegramBot = telepot.Bot(TOKEN)
@@ -44,9 +45,9 @@ def receive_tel_message():
         chat_id = message['message']['chat']['id']
         if message["message"].get("text"):
             response_sent_text = get_translated_message(message["message"].get("text"))
-            generate_audio(response_sent_text)
+            filename = generate_audio(response_sent_text)
             TelegramBot.sendMessage(chat_id, response_sent_text)
-            TelegramBot.sendAudio(chat_id, domain + audio_path)
+            TelegramBot.sendAudio(chat_id, domain + audio_path + "/" + filename)
         elif message["message"].get("photo"):
             photo_id = message["message"].get("photo")
             TelegramBot.download_file(photo_id, "./photo.jpg")
@@ -55,7 +56,7 @@ def receive_tel_message():
             translated_message = get_translated_message(label, src="en")
             generate_audio(translated_message)
             TelegramBot.sendMessage(chat_id, translated_message)
-            TelegramBot.sendAudio(chat_id, domain + audio_path)
+            TelegramBot.sendAudio(chat_id, domain + audio_path + "/" + filename)
 
     return "Sucesso"
 
@@ -157,8 +158,10 @@ def get_audio_message():
 
 
 def generate_audio(text):
+    filename = str(uuid.uuid4())
     tts = gTTS(text, lang="es-es")
-    tts.save(audio_path)
+    tts.save(audio_path + "/" + filename)
+    return filename
 
 
 def get_message():
