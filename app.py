@@ -158,10 +158,6 @@ def get_audio_message():
 
 def generate_audio(text):
     tts = gTTS(text, lang="es-es")
-
-    if not os.path.exists(os.path.dirname(audio_path)):
-        os.makedirs(os.path.dirname(audio_path))
-
     tts.save(audio_path)
 
 
