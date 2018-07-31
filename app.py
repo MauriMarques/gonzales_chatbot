@@ -18,7 +18,7 @@ app = Flask(__name__, static_folder="audio")
 ACCESS_TOKEN = "EAAIj1rbKwNABALab50gBoXT2eMd1MYhFP0jw6MAG4eLVGwTKYufUxkZAAzllNGxo1Gu59xwloY8IEdJGvoaUOOXEkuJcLUbx4irhbZCvbyxEqss7m3vA5XkwhlxH8ZBQdvayq3IBw5vANx9mE6ec82BZBHHzH3z4qTaFJWQ75Yf0Lb9LX3sM"
 VERIFY_TOKEN = "TOKENDOCHATBOT"
 bot = Bot(ACCESS_TOKEN)
-audio_path = "audio/audio.mp3"
+audio_path = "audio"
 received_audio_path = "audio/received_audio.aac"
 received_audio_wav_path = "audio/received_audio.wav"
 speech_recog = sr.Recognizer()
