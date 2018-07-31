@@ -47,7 +47,7 @@ def receive_tel_message():
             response_sent_text = get_translated_message(message["message"].get("text"))
             filename = generate_audio(response_sent_text)
             TelegramBot.sendMessage(chat_id, response_sent_text)
-            TelegramBot.sendAudio(chat_id, domain + audio_path + "/" + filename)
+            TelegramBot.sendVoice(chat_id, domain + audio_path + "/" + filename)
         elif message["message"].get("photo"):
             photo_id = message["message"].get("photo")
             TelegramBot.download_file(photo_id, "./photo.jpg")
@@ -158,10 +158,17 @@ def get_audio_message():
 
 
 def generate_audio(text):
-    filename = str(uuid.uuid4()) + ".mp3"
+    filename = str(uuid.uuid4())
+    filename_mp3 = filename + ".mp3"
     tts = gTTS(text, lang="es-es")
-    tts.save(audio_path + "/" + filename)
-    return filename
+    tts.save(audio_path + "/" + filename_mp3)
+
+    filename_ogg = filename + ".ogg"
+
+    aac_version = AudioSegment.from_file(audio_path + "/" + filename_mp3, "mp3")
+    aac_version.export(audio_path + "/" + filename_ogg, format="ogg")
+
+    return filename_ogg
 
 
 def get_message():
