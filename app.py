@@ -158,7 +158,7 @@ def get_audio_message():
 
 
 def generate_audio(text):
-    filename = str(uuid.uuid4())
+    filename = str(uuid.uuid4()) + ".mp3"
     tts = gTTS(text, lang="es-es")
     tts.save(audio_path + "/" + filename)
     return filename
